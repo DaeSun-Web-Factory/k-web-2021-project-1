@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-kweb2021project1-dev-140106-authRole",
+      "UnauthRoleArn": "arn:aws:iam::316764952606:role/amplify-kweb2021project1-dev-140106-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::316764952606:role/amplify-kweb2021project1-dev-140106-authRole",
+      "Region": "ap-northeast-2",
+      "DeploymentBucketName": "amplify-kweb2021project1-dev-140106-deployment",
+      "UnauthRoleName": "amplify-kweb2021project1-dev-140106-unauthRole",
+      "StackName": "amplify-kweb2021project1-dev-140106",
+      "StackId": "arn:aws:cloudformation:ap-northeast-2:316764952606:stack/amplify-kweb2021project1-dev-140106/8d341c80-4375-11ec-808b-02284d085524",
+      "AmplifyAppId": "d26oghkyq2sp88"
+    },
+    "categories": {
+      "auth": {
+        "kweb2021project150ff7845": {}
+      }
+    }
+  }
+}

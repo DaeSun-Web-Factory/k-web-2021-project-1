@@ -1,0 +1,9 @@
+{
+				formType === 'signIn' && (
+					<div>
+						<input name="username" onChange={onChange} placeholder="username"/>
+						<input name="password" type="password" onChange={onChange} placeholder="password"/>
+						<button onClick={signIn}> Sign In </button>
+					</div>
+				)
+			}
