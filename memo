@@ -7,3 +7,288 @@
 					</div>
 				)
 			}
+
+
+
+            <div>
+						<input name="username" onChange={onChange} placeholder="username"/>
+						<input name="password" type="password" onChange={onChange} placeholder="password"/>
+						<input name="email" onChange={onChange} placeholder="email"/>
+						<button onClick={signUp}> Sign Up </button>
+					</div>
+
+
+                    <div>
+						<input name="authCode" onChange={onChange} placeholder="Confirmation code"/>
+						<button onClick={confirmSignUp}> Confirm Sign Up </button>
+					</div>
+
+
+
+                    ```jsx
+amplify add api //Amazon Cognoti User Pool을 써라 
+// Do you want to edit the schema now? (y/N) y
+
+amplify push
+
+npm install --save @material-ui/core @material-ui/icons
+
+npm install --save uuid
+```
+
+
+//새로운 game data를 Create한다.
+  const createNewGameData = async() => {
+    const newGameDataInput = {
+      "id": uuid(),
+      "version":newGameData.version,
+      "min_warrior_attack":newGameData.min_warrior_attack,
+      "max_warrior_attack":newGameData.max_warrior_attack,
+      "min_boss_health":newGameData.min_boss_health,
+      "max_boss_health":newGameData.max_boss_health
+    }
+
+    await API.graphql(graphqlOperation(createGameSetting, {input: newGameDataInput}));
+    fetchGameData();
+  }
+
+  import Amplify, {API, graphqlOperation}from 'aws-amplify';
+
+
+  ```jsx
+// basic react system
+import React, { useEffect, useState}  from 'react';
+import './App.css';
+
+// AWS 
+import Amplify, {API, graphqlOperation}from 'aws-amplify';
+import awsconfig from './aws-exports';
+import {AmplifySignOut, withAuthenticator} from '@aws-amplify/ui-react';
+
+// AWS APIs
+import {listGameSettings} from './graphql/queries'
+import {createGameSetting} from './graphql/mutations'
+
+//uuid
+import {v4 as uuid} from 'uuid'
+
+//UIs
+import { TextField } from '@material-ui/core';
+
+Amplify.configure(awsconfig);
+
+function App() {
+  //variables
+  const [lastestGameData, setLastestGameData] = useState([]);
+  const [newGameData, setNewGameData] = useState([]);
+
+  const [testGameData, setTestGameData] = useState([]);
+  const [estimatedResult, setEstimatedResult] = useState(false);
+  const [showButton, setShowButton] = useState(true);
+
+  //game data를 패치한다. 다시 불러오는 것이다.
+  const fetchGameData = async() => {
+    try{
+      const gameData = await API.graphql(graphqlOperation(listGameSettings))
+      let gameDataList =  gameData.data.listGameSettings.items;
+      console.log('gameDataList', gameDataList)
+
+      gameDataList.sort((a, b) => (a.updatedAt > b.updatedAt) ? -1 : 1)
+      setLastestGameData(gameDataList[0]);
+      console.log('lastestGameData', lastestGameData)
+ 
+     }
+    catch (error) {
+      console.log('error on fetching game data', error);
+    }
+  }
+
+  useEffect(() => {
+    fetchGameData();
+  }, []);
+
+  //새로운 game data를 Create한다.
+  const createNewGameData = async() => {
+    const newGameDataInput = {
+      "id": uuid(),
+      "version":newGameData.version,
+      "min_warrior_attack":newGameData.min_warrior_attack,
+      "max_warrior_attack":newGameData.max_warrior_attack,
+      "min_boss_health":newGameData.min_boss_health,
+      "max_boss_health":newGameData.max_boss_health
+    }
+
+    await API.graphql(graphqlOperation(createGameSetting, {input: newGameDataInput}));
+    fetchGameData();
+  }
+
+  var callAPI = ()=>{
+    // instantiate a headers object
+    var myHeaders = new Headers();
+    // add content type header to object
+    myHeaders.append("Content-Type", "application/json");
+    // using built in JSON utility package turn object to string and store in a variable
+    var raw = JSON.stringify({"data":`${testGameData.boss_health},${testGameData.warrior_attack}`});
+    // create a JSON object with parameters for API call and store in a variable
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    };
+    // make API call with parameters and use promises to get response
+    fetch("https://1dxvyo4vik.execute-api.ap-northeast-1.amazonaws.com/dev", requestOptions)
+    .then(response => response.text())    
+    .then(result => (setEstimatedResult(JSON.parse(JSON.parse(result).body))))
+    .catch(error => console.log('error', error))
+    .finally(()=> {setShowButton(false)});
+
+    
+    //fetchGameData();
+  }
+
+  
+  
+    return (
+      <div className="App">
+        <header className="App-header">
+          <h1>Current Game Player Settings</h1>
+          <div className="text_field"> version : {lastestGameData.version} </div>
+          <div className="text_field"> 전사 최소 공격력 : {lastestGameData.min_warrior_attack} </div>
+          <div className="text_field"> 전사 최대 공격력 : {lastestGameData.max_warrior_attack} </div>
+          <div className="text_field"> 보스 최소 체력 : {lastestGameData.min_boss_health} </div>
+          <div className="text_field"> 보스 최대 체력 : {lastestGameData.max_boss_health} </div>
+
+          <h1>Edit Game Player Settings</h1>
+          <div className="text_field"> version : 
+            <TextField value={newGameData.version} 
+              onChange={e => setNewGameData({...newGameData, version:e.target.value})} 
+            /> 
+          </div>
+
+          <div className="text_field"> 전사 최소 공격력 :  
+          <TextField  value={newGameData.min_warrior_attack} 
+              onChange={e => setNewGameData({...newGameData, min_warrior_attack:e.target.value})} 
+            /> 
+          </div>
+
+          <div className="text_field"> 전사 최대 공격력 :
+            <TextField value={newGameData.max_warrior_attack} 
+              onChange={e => setNewGameData({...newGameData, max_warrior_attack:e.target.value})} 
+            /> 
+          </div>
+
+          <div className="text_field"> 보스 최소 체력 :
+            <TextField value={newGameData.min_boss_health} 
+              onChange={e => setNewGameData({...newGameData, min_boss_health:e.target.value})} 
+            /> 
+          </div>
+
+          <div className="text_field"> 보스 최대 체력 :
+            <TextField value={newGameData.max_boss_health} 
+              onChange={e => setNewGameData({...newGameData, max_boss_health:e.target.value})} 
+            /> 
+          
+          </div>
+
+          <div className="custom_button" onClick={()=> createNewGameData()}> 적용하기 </div>
+
+          <h1>Raid Estimation</h1>
+          <div className="text_field"> 전사 체력 :
+            <TextField value={testGameData.warrior_attack} 
+              onChange={e => setTestGameData({...testGameData, warrior_attack:e.target.value})} 
+            /> 
+          </div>
+          <div className="text_field"> 보스 체력 : 
+            <TextField value={testGameData.boss_health} 
+              onChange={e => setTestGameData({...testGameData, boss_health:e.target.value})} 
+            /> 
+          </div>
+
+          {showButton ? <div className="custom_button" onClick={()=> callAPI()}> 예측하기 </div> :
+            estimatedResult ? <div> 레이드 성공 예상! </div> : <div> 레이드 실패 예상 </div>
+          }
+
+          {estimatedResult}
+
+          
+
+          
+          <h1> Go to AI Studio </h1>
+          <div className="custom_button"> Go! </div>
+  
+          <h1>Settings</h1>
+          <AmplifySignOut/>
+        </header>
+      </div>
+    );
+  
+  
+}
+
+export default withAuthenticator(App);
+```
+
+const fetchGameData = async() => {
+    try{
+      const gameData = await API.graphql(graphqlOperation(listGameSettings))
+      let gameDataList =  gameData.data.listGameSettings.items;
+      console.log('gameDataList', gameDataList)
+
+      gameDataList.sort((a, b) => (a.updatedAt > b.updatedAt) ? -1 : 1)
+      setLastestGameData(gameDataList[0]);
+      console.log('lastestGameData', lastestGameData)
+ 
+     }
+    catch (error) {
+      console.log('error on fetching game data', error);
+    }
+  }
+
+  https://j7ee7g38jf.execute-api.us-east-1.amazonaws.com/dev
+
+
+
+<Grid className={classes.container} container alignItems="stretch" spacing={3}>
+								{userInfo.map((userIn, index) => (
+									<Grid key={index} item xs={12} sm={12}>
+										<Card className={classes.card} >
+											<CardMedia className={classes.media} title={userIn.ID}> </CardMedia>
+
+											<div className={classes.overlay}>
+												<Typography variant="h6"> {`${userIn.ID}`}</Typography>
+												<Typography variant="body2"> {`${userIn.name} : ${userIn.email}분반`} </Typography>
+												<Typography variant="body2"> {`${userIn.name} 교수님`} </Typography>
+											</div>
+
+											<div className={classes.overlay2}>
+												<Button style={{color: 'white'}} size="small">
+													<MoreHorizIcon fontSize="default"/>
+												</Button>
+											</div>
+
+
+											<div className={classes.detailsTop}>
+												<Typography variant="body2" color="textSecondary"> {`${userIn.address}년 ${userIn.phone}`}</Typography>
+											</div>
+
+											<div className={classes.detailsBottom}>
+												<Typography variant="body2" color="textSecondary">  </Typography>
+											</div>
+
+											<CardActions className={classes.cardActions}>
+												<Button size="small" color="primary" >
+													<EditIcon fontSize="small" />
+													Edit
+												</Button>
+
+												<Button size="small" color="primary">
+													<DeleteOutlineIcon fontSize="small" />
+													Delete
+												</Button>
+											</CardActions>
+
+										</Card>
+									</Grid>
+								))}
+							</Grid>
